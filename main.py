@@ -49,12 +49,13 @@ def encrypt():
 
 def decrypt():
     state = get_state()
-    cipherText = state["cipherText"]
-    encMethod = ENC_MODES[state["encMethod"]](state["key"])
-
-    plainText = encMethod.decrypt(cipherText)
-    writeTextArea(plainTextArea, plainText)
-    del encMethod
+    try:
+        encMethod = ENC_MODES[state["encMethod"]](state["key"])
+        plainText = encMethod.decrypt(state["cipherText"])
+        writeTextArea(plainTextArea, plainText)
+        del encMethod
+    except Exception as e:
+        tk.messagebox.showerror("Error", e)
 
 
 def openToText(output):
