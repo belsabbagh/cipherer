@@ -1,5 +1,6 @@
 import tkinter as tk
 from src.methods import *
+import tkinter.filedialog as fd
 
 ENC_MODES = {
     "Caesar": Caesar,
@@ -49,10 +50,52 @@ def decrypt():
     del encMethod
 
 
+def openToText(output):
+    filename = fd.askopenfilename()
+    with open(filename, "r") as file:
+        plainText = file.read()
+    writeTextArea(output, plainText)
+
+
+def saveFromText(textArea, name):
+    filename = fd.asksaveasfile(
+        initialfile=f"{name}.txt",
+        mode="w",
+        defaultextension=".txt",
+        filetypes=[("Text File", "*.txt")],
+    )
+    if filename is None:
+        return
+    text = textArea.get("1.0", tk.END)
+    filename.write(text)
+    filename.close()
+
+
+file_commands = {
+    "encrypt": {
+        "open": lambda: openToText(plainTextArea),
+        "save": lambda: saveFromText(plainTextArea, "plaintext"),
+    },
+    "decrypt": {
+        "open": lambda: openToText(cipherTextArea),
+        "save": lambda: saveFromText(cipherTextArea, "ciphertext"),
+    },
+}
+
+
+def fileButtons(master, commands):
+    frame = tk.Frame(master)
+    openButton = tk.Button(frame, text="Open", command=commands["open"])
+    saveButton = tk.Button(frame, text="Save", command=commands["save"])
+    openButton.pack(side=tk.LEFT, **STD_PACK)
+    saveButton.pack(side=tk.LEFT, **STD_PACK)
+    return frame
+
+
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Cipherer")
-    root.geometry("840x640")
+    root.geometry("840x600")
     root.minsize(840, 640)
     row = tk.Frame(root)
     row.pack(side=tk.LEFT, fill=tk.BOTH, **STD_PACK)
@@ -63,6 +106,7 @@ if __name__ == "__main__":
     textAreaLabel.pack(side=tk.TOP, **STD_PACK)
     plainTextArea = tk.Text(textAreaFrame, width=40, height=20)
     plainTextArea.pack(side=tk.TOP, **STD_PACK)
+    fileButtons(textAreaFrame, file_commands["encrypt"]).pack(side=tk.TOP, **STD_PACK)
 
     buttonFrame = tk.Frame(row)
     buttonFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
@@ -72,7 +116,7 @@ if __name__ == "__main__":
         *list(ENC_MODES.keys()),
     )
     dropDown.pack(side=tk.TOP, **STD_PACK)
-    keyTextArea = tk.Text(buttonFrame, width=7, height=5)
+    keyTextArea = tk.Text(buttonFrame, width=7, height=7)
     keyTextArea.pack(side=tk.TOP, **STD_PACK)
     encryptButton = tk.Button(buttonFrame, text="Encrypt", command=encrypt)
     encryptButton.pack(side=tk.TOP, **STD_PACK)
@@ -85,5 +129,6 @@ if __name__ == "__main__":
     textAreaLabel.pack(side=tk.TOP, **STD_PACK)
     cipherTextArea = tk.Text(textAreaFrame, width=40, height=20)
     cipherTextArea.pack(side=tk.TOP, **STD_PACK)
+    fileButtons(textAreaFrame, file_commands["decrypt"]).pack(side=tk.TOP, **STD_PACK)
 
     root.mainloop()
