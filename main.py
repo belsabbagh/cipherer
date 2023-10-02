@@ -12,16 +12,14 @@ STD_PACK = {"padx": 5, "pady": 5, "expand": True}
 
 
 def get_state():
-    plainText = plainTextArea.get("1.0", tk.END).replace("\n", "")
-    cipherText = cipherTextArea.get("1.0", tk.END).replace("\n", "")
     encMethod = dropDown.cget("text")
     key = keyTextArea.get("1.0", tk.END).rsplit("\n", 1)[0]
     if encMethod != "Hill":
         key = key.replace("\n", "")
     state = {
-        "plainText": plainText,
-        "cipherText": cipherText,
-        "encMethod": dropDown.cget("text"),
+        "plainText": plainTextArea.get("1.0", tk.END).replace("\n", ""),
+        "cipherText": cipherTextArea.get("1.0", tk.END).replace("\n", ""),
+        "encMethod": encMethod,
         "key": key,
     }
     print(state)
@@ -35,10 +33,8 @@ def writeTextArea(textArea, text):
 
 def encrypt():
     state = get_state()
-    plainText = state["plainText"]
     encMethod = ENC_MODES[state["encMethod"]](state["key"])
-
-    cipherText = encMethod.encrypt(plainText)
+    cipherText = encMethod.encrypt(state["plainText"])
     writeTextArea(cipherTextArea, cipherText)
 
 
@@ -68,7 +64,6 @@ if __name__ == "__main__":
 
     buttonFrame = tk.Frame(row)
     buttonFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
-
     dropDown = tk.OptionMenu(
         buttonFrame,
         tk.StringVar(),
@@ -77,16 +72,16 @@ if __name__ == "__main__":
     dropDown.pack(side=tk.TOP, **STD_PACK)
     keyTextArea = tk.Text(buttonFrame, width=7, height=5)
     keyTextArea.pack(side=tk.TOP, **STD_PACK)
-
     encryptButton = tk.Button(buttonFrame, text="Encrypt", command=encrypt)
     encryptButton.pack(side=tk.TOP, **STD_PACK)
-
     decryptButton = tk.Button(buttonFrame, text="Decrypt", command=decrypt)
     decryptButton.pack(side=tk.TOP, **STD_PACK)
+
     textAreaFrame = tk.Frame(row)
     textAreaFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
     textAreaLabel = tk.Label(textAreaFrame, text="Cipher Text")
     textAreaLabel.pack(side=tk.TOP, **STD_PACK)
     cipherTextArea = tk.Text(textAreaFrame, width=40, height=20)
     cipherTextArea.pack(side=tk.TOP, **STD_PACK)
+
     root.mainloop()
