@@ -1,9 +1,12 @@
 from .__base import EncMethod
 from string import ascii_uppercase as ALPHABET
 
+
 class Playfair(EncMethod):
     def __init__(self, key: str) -> None:
-        self.key = key
+        if not all([c.isalpha() for c in key]):
+            raise ValueError("Invalid key. Key must only contain letters.")
+        self.key = key.upper()
         self.__generate_matrix()
         super().__init__()
 
