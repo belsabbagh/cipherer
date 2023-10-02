@@ -39,9 +39,18 @@ def matrix_inverse_mod26(matrix):
 
 class Hill(EncMethod):
     def __init__(self, key: str) -> None:
-        csv = self.__parse_csv(key)
+        try:
+            csv = self.__parse_csv(key)
+        except ValueError:
+            raise ValueError("Invalid key. Matrix does not follow csv format.")
         if not all([len(row) == len(csv) for row in csv]):
             raise ValueError("Invalid key. Matrix must be square.")
+        if len(csv) < 2:
+            raise ValueError("Invalid key. Matrix must be at least 2x2.")
+        if np.linalg.det(csv) == 0:
+            raise ValueError("Invalid key. Matrix is not invertible.")
+        if not all([all([isinstance(num, int) for num in row]) for row in csv]):
+            raise ValueError("Invalid key. Matrix must contain integers.")
         self.key = csv
         super().__init__()
 

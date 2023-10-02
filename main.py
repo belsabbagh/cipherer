@@ -12,14 +12,18 @@ ENC_MODES = {
 STD_PACK = {"padx": 5, "pady": 5, "expand": True}
 
 
+def clean_text(text):
+    return "".join([c for c in text if c.isalpha()]).upper()
+
+
 def get_state():
     encMethod = dropDown.cget("text")
     key = keyTextArea.get("1.0", tk.END).rsplit("\n", 1)[0]
     if encMethod != "Hill":
         key = key.replace("\n", "")
     state = {
-        "plainText": plainTextArea.get("1.0", tk.END).replace("\n", ""),
-        "cipherText": cipherTextArea.get("1.0", tk.END).replace("\n", ""),
+        "plainText": clean_text(plainTextArea.get("1.0", tk.END)),
+        "cipherText": clean_text(cipherTextArea.get("1.0", tk.END)),
         "encMethod": encMethod,
         "key": key,
     }
@@ -34,20 +38,24 @@ def writeTextArea(textArea, text):
 
 def encrypt():
     state = get_state()
-    encMethod = ENC_MODES[state["encMethod"]](state["key"])
-    cipherText = encMethod.encrypt(state["plainText"])
-    writeTextArea(cipherTextArea, cipherText)
-    del encMethod
+    try:
+        encMethod = ENC_MODES[state["encMethod"]](state["key"])
+        cipherText = encMethod.encrypt(state["plainText"])
+        writeTextArea(cipherTextArea, cipherText)
+        del encMethod
+    except Exception as e:
+        tk.messagebox.showerror("Error", e)
 
 
 def decrypt():
     state = get_state()
-    cipherText = state["cipherText"]
-    encMethod = ENC_MODES[state["encMethod"]](state["key"])
-
-    plainText = encMethod.decrypt(cipherText)
-    writeTextArea(plainTextArea, plainText)
-    del encMethod
+    try:
+        encMethod = ENC_MODES[state["encMethod"]](state["key"])
+        plainText = encMethod.decrypt(state["cipherText"])
+        writeTextArea(plainTextArea, plainText)
+        del encMethod
+    except Exception as e:
+        tk.messagebox.showerror("Error", e)
 
 
 def openToText(output):
@@ -98,7 +106,7 @@ if __name__ == "__main__":
     root.geometry("840x600")
     root.minsize(840, 640)
     row = tk.Frame(root)
-    row.pack(side=tk.LEFT, fill=tk.BOTH, **STD_PACK)
+    row.pack(side=tk.TOP, fill=tk.BOTH, **STD_PACK)
 
     textAreaFrame = tk.Frame(row)
     textAreaFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
