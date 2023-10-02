@@ -15,7 +15,7 @@ def get_state():
     plainText = plainTextArea.get("1.0", tk.END).replace("\n", "")
     cipherText = cipherTextArea.get("1.0", tk.END).replace("\n", "")
     encMethod = dropDown.cget("text")
-    key = keyTextArea.get("1.0", tk.END).rsplit('\n', 1)[0]
+    key = keyTextArea.get("1.0", tk.END).rsplit("\n", 1)[0]
     if encMethod != "Hill":
         key = key.replace("\n", "")
     state = {
@@ -54,16 +54,20 @@ def decrypt():
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Cipherer")
-    root.geometry("1024x720")
-
+    root.geometry("840x640")
+    root.minsize(840, 640)
     row = tk.Frame(root)
-    row.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
+    row.pack(side=tk.LEFT, fill=tk.BOTH, **STD_PACK)
 
-    buttonFrame = tk.Frame(root)
+    textAreaFrame = tk.Frame(row)
+    textAreaFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
+    textAreaLabel = tk.Label(textAreaFrame, text="Plain Text")
+    textAreaLabel.pack(side=tk.TOP, **STD_PACK)
+    plainTextArea = tk.Text(textAreaFrame, width=40, height=20)
+    plainTextArea.pack(side=tk.TOP, **STD_PACK)
+
+    buttonFrame = tk.Frame(row)
     buttonFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
-
-    cipherTextArea = tk.Text(root, width=40, height=20)
-    cipherTextArea.pack(side=tk.LEFT, **STD_PACK)
 
     dropDown = tk.OptionMenu(
         buttonFrame,
@@ -79,8 +83,10 @@ if __name__ == "__main__":
 
     decryptButton = tk.Button(buttonFrame, text="Decrypt", command=decrypt)
     decryptButton.pack(side=tk.TOP, **STD_PACK)
-
-    plainTextArea = tk.Text(row, width=40, height=20)
-    plainTextArea.pack(side=tk.LEFT, **STD_PACK)
-
+    textAreaFrame = tk.Frame(row)
+    textAreaFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
+    textAreaLabel = tk.Label(textAreaFrame, text="Cipher Text")
+    textAreaLabel.pack(side=tk.TOP, **STD_PACK)
+    cipherTextArea = tk.Text(textAreaFrame, width=40, height=20)
+    cipherTextArea.pack(side=tk.TOP, **STD_PACK)
     root.mainloop()
