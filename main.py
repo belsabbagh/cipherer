@@ -36,6 +36,7 @@ def encrypt():
     encMethod = ENC_MODES[state["encMethod"]](state["key"])
     cipherText = encMethod.encrypt(state["plainText"])
     writeTextArea(cipherTextArea, cipherText)
+    del encMethod
 
 
 def decrypt():
@@ -45,6 +46,7 @@ def decrypt():
 
     plainText = encMethod.decrypt(cipherText)
     writeTextArea(plainTextArea, plainText)
+    del encMethod
 
 
 if __name__ == "__main__":
