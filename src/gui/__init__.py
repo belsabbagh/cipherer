@@ -9,8 +9,8 @@ class FileButtons(tk.Frame):
     def __init__(self, master, commands) -> None:
         self.openButton = ttk.Button(master, text="Open", command=commands["open"])
         self.saveButton = ttk.Button(master, text="Save", command=commands["save"])
-        self.openButton.pack(side=tk.LEFT)
-        self.saveButton.pack(side=tk.LEFT)
+        self.openButton.pack(side=tk.LEFT, padx=5, pady=5)
+        self.saveButton.pack(side=tk.LEFT, padx=5, pady=5)
 
 
 class TextEndpoint:
