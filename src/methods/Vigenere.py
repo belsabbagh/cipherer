@@ -6,7 +6,7 @@ class Vigenere(EncMethod):
     def __init__(self, key: str, mode: Literal["auto", "repeat"] = "repeat") -> None:
         if mode not in ["auto", "repeat"]:
             raise ValueError("Invalid mode. Mode must be 'auto' or 'repeat'.")
-        self.key = key
+        self.key = key.upper()
         self.mode = mode
         super().__init__()
 
@@ -20,6 +20,7 @@ class Vigenere(EncMethod):
         data_len = len(data)
         key = self.key
         if self.mode == "auto":
+            print((self.key + data)[:data_len])
             return (self.key + data)[:data_len]
         if len(key) > data_len:
             return key[:data_len]
@@ -27,7 +28,7 @@ class Vigenere(EncMethod):
             return self.__pad_key(data_len)
 
     def encrypt(self, data: str) -> str:
-        key = self.__make_key(len(data))
+        key = self.__make_key(data)
         cipher_text = []
         for i in range(len(data)):
             x = (ord(data[i]) + ord(key[i])) % 26
@@ -36,7 +37,7 @@ class Vigenere(EncMethod):
         return "".join(cipher_text)
 
     def decrypt(self, data: str) -> str:
-        key = self.__make_key(len(data))
+        key = self.__make_key(data)
         plain_text = []
         for i in range(len(data)):
             x = (ord(data[i]) - ord(key[i]) + 26) % 26

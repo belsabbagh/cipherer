@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from src.methods import *
 from src.gui.state import state
 import tkinter.filedialog as fd
@@ -11,6 +12,7 @@ ENC_MODES = {
     "Vigenere": Vigenere,
     "Vernam": Vernam,
 }
+
 STD_PACK = {"padx": 5, "pady": 5, "expand": True}
 
 
@@ -23,12 +25,17 @@ def get_state():
     key = keyTextArea.get("1.0", tk.END).rsplit("\n", 1)[0]
     if encMethod != "Hill":
         key = key.replace("\n", "")
-    state["encMethod"] = encMethod
     state["key"] = key
     state["plainText"] = clean_text(plainTextEndpoint.textArea.get("1.0", tk.END))
     state["cipherText"] = clean_text(cipherTextEndpoint.textArea.get("1.0", tk.END))
-    print(state)
+    state["vigenereMode"] = vignereMode.cget("text")
     return state
+
+
+def show_selected(value):
+    state["encMethod"] = value
+    if value == "Vigenere":
+        return
 
 
 def writeTextArea(textArea, text):
@@ -39,7 +46,10 @@ def writeTextArea(textArea, text):
 def encrypt():
     state = get_state()
     try:
-        encMethod = ENC_MODES[state["encMethod"]](state["key"])
+        args = [state["key"]]
+        if state["encMethod"] == "Vigenere":
+            args.append(state["vigenereMode"].lower())
+        encMethod = ENC_MODES[state["encMethod"]](*args)
         cipherText = encMethod.encrypt(state["plainText"])
         writeTextArea(cipherTextEndpoint.textArea, cipherText)
         del encMethod
@@ -91,17 +101,10 @@ file_commands = {
 }
 
 
-def fileButtons(master, commands):
-    frame = tk.Frame(master)
-    openButton = tk.Button(frame, text="Open", command=commands["open"])
-    saveButton = tk.Button(frame, text="Save", command=commands["save"])
-    openButton.pack(side=tk.LEFT, **STD_PACK)
-    saveButton.pack(side=tk.LEFT, **STD_PACK)
-    return frame
-
-
 if __name__ == "__main__":
     root = tk.Tk()
+    style = ttk.Style()
+    style.theme_use("winnative")
     root.title("Cipherer")
     root.geometry("840x600")
     root.minsize(840, 600)
@@ -123,13 +126,16 @@ if __name__ == "__main__":
         controlsFrame,
         tk.StringVar(),
         *list(ENC_MODES.keys()),
+        command=show_selected,
     )
     keyTextArea = tk.Text(controlsFrame, width=7, height=7)
-    encryptButton = tk.Button(controlsFrame, text="Encrypt", command=encrypt)
-    decryptButton = tk.Button(controlsFrame, text="Decrypt", command=decrypt)
+    vignereMode = tk.OptionMenu(controlsFrame, tk.StringVar(), *["Auto", "Repeat"])
+    encryptButton = ttk.Button(controlsFrame, text="Encrypt", command=encrypt)
+    decryptButton = ttk.Button(controlsFrame, text="Decrypt", command=decrypt)
 
     dropDown.pack(side=tk.TOP, **STD_PACK)
     keyTextArea.pack(side=tk.TOP, **STD_PACK)
+    vignereMode.pack(side=tk.TOP, **STD_PACK)
     encryptButton.pack(side=tk.TOP, **STD_PACK)
     decryptButton.pack(side=tk.TOP, **STD_PACK)
 

@@ -1,5 +1,5 @@
 import tkinter as tk
-
+from tkinter import ttk
 
 class FileButtons(tk.Frame):
     frame = None
@@ -7,8 +7,8 @@ class FileButtons(tk.Frame):
     saveButton = None
 
     def __init__(self, master, commands) -> None:
-        self.openButton = tk.Button(master, text="Open", command=commands["open"])
-        self.saveButton = tk.Button(master, text="Save", command=commands["save"])
+        self.openButton = ttk.Button(master, text="Open", command=commands["open"])
+        self.saveButton = ttk.Button(master, text="Save", command=commands["save"])
         self.openButton.pack(side=tk.LEFT)
         self.saveButton.pack(side=tk.LEFT)
 
@@ -21,7 +21,7 @@ class TextEndpoint:
 
     def __init__(self, master, name, button_commands):
         self.textArea = tk.Text(master, width=40, height=20)
-        self.label = tk.Label(master, text=name)
+        self.label = ttk.Label(master, text=name)
         self.fileButtonsFrame = tk.Frame(master)
         self.fileButtons = FileButtons(self.fileButtonsFrame, button_commands)
         self.label.pack(side=tk.TOP)

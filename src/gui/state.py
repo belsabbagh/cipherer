@@ -3,4 +3,5 @@ state = {
     "cipherText": "",
     "encMethod": "",
     "key": "",
+    "vigenereMode": "",
 }
