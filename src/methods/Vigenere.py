@@ -20,7 +20,6 @@ class Vigenere(EncMethod):
         data_len = len(data)
         key = self.key
         if self.mode == "auto":
-            print((self.key + data)[:data_len])
             return (self.key + data)[:data_len]
         if len(key) > data_len:
             return key[:data_len]

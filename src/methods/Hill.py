@@ -37,20 +37,25 @@ def matrix_inverse_mod26(matrix):
     return inverse_mod26
 
 
+def guard_matrix(matrix):
+    if not all([len(row) == len(matrix) for row in matrix]):
+        raise ValueError("Invalid key. Matrix must be square.")
+    if len(matrix) < 2:
+        raise ValueError("Invalid key. Matrix must be at least 2x2.")
+    if np.linalg.det(matrix) == 0:
+        raise ValueError("Invalid key. Matrix is not invertible.")
+    if not all([all([isinstance(num, int) for num in row]) for row in matrix]):
+        raise ValueError("Invalid key. Matrix must contain integers.")
+    return True
+
+
 class Hill(EncMethod):
     def __init__(self, key: str) -> None:
         try:
             mat = self.__parse_csv(key)
         except ValueError:
             raise ValueError("Invalid key. Matrix does not follow csv format.")
-        if not all([len(row) == len(mat) for row in mat]):
-            raise ValueError("Invalid key. Matrix must be square.")
-        if len(mat) < 2:
-            raise ValueError("Invalid key. Matrix must be at least 2x2.")
-        if np.linalg.det(mat) == 0:
-            raise ValueError("Invalid key. Matrix is not invertible.")
-        if not all([all([isinstance(num, int) for num in row]) for row in mat]):
-            raise ValueError("Invalid key. Matrix must contain integers.")
+        guard_matrix(mat)
         self.key = mat
         super().__init__()
 
