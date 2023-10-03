@@ -1,6 +1,8 @@
 import tkinter as tk
 from src.methods import *
+from src.gui.state import state
 import tkinter.filedialog as fd
+from src.gui import TextEndpoint
 
 ENC_MODES = {
     "Caesar": Caesar,
@@ -21,12 +23,10 @@ def get_state():
     key = keyTextArea.get("1.0", tk.END).rsplit("\n", 1)[0]
     if encMethod != "Hill":
         key = key.replace("\n", "")
-    state = {
-        "plainText": clean_text(plainTextArea.get("1.0", tk.END)),
-        "cipherText": clean_text(cipherTextArea.get("1.0", tk.END)),
-        "encMethod": encMethod,
-        "key": key,
-    }
+    state["encMethod"] = encMethod
+    state["key"] = key
+    state["plainText"] = clean_text(plainTextEndpoint.textArea.get("1.0", tk.END))
+    state["cipherText"] = clean_text(cipherTextEndpoint.textArea.get("1.0", tk.END))
     print(state)
     return state
 
@@ -41,7 +41,7 @@ def encrypt():
     try:
         encMethod = ENC_MODES[state["encMethod"]](state["key"])
         cipherText = encMethod.encrypt(state["plainText"])
-        writeTextArea(cipherTextArea, cipherText)
+        writeTextArea(cipherTextEndpoint.textArea, cipherText)
         del encMethod
     except Exception as e:
         tk.messagebox.showerror("Error", e)
@@ -52,7 +52,7 @@ def decrypt():
     try:
         encMethod = ENC_MODES[state["encMethod"]](state["key"])
         plainText = encMethod.decrypt(state["cipherText"])
-        writeTextArea(plainTextArea, plainText)
+        writeTextArea(plainTextEndpoint.textArea, plainText)
         del encMethod
     except Exception as e:
         tk.messagebox.showerror("Error", e)
@@ -81,12 +81,12 @@ def saveFromText(textArea, name):
 
 file_commands = {
     "encrypt": {
-        "open": lambda: openToText(plainTextArea),
-        "save": lambda: saveFromText(plainTextArea, "plaintext"),
+        "open": lambda: openToText(plainTextEndpoint.textArea),
+        "save": lambda: saveFromText(plainTextEndpoint.textArea, "plaintext"),
     },
     "decrypt": {
-        "open": lambda: openToText(cipherTextArea),
-        "save": lambda: saveFromText(cipherTextArea, "ciphertext"),
+        "open": lambda: openToText(cipherTextEndpoint.textArea),
+        "save": lambda: saveFromText(cipherTextEndpoint.textArea, "ciphertext"),
     },
 }
 
@@ -104,39 +104,37 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Cipherer")
     root.geometry("840x600")
-    root.minsize(840, 640)
+    root.minsize(840, 600)
     row = tk.Frame(root)
     row.pack(side=tk.TOP, fill=tk.BOTH, **STD_PACK)
 
-    textAreaFrame = tk.Frame(row)
-    textAreaFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
-    textAreaLabel = tk.Label(textAreaFrame, text="Plain Text")
-    textAreaLabel.pack(side=tk.TOP, **STD_PACK)
-    plainTextArea = tk.Text(textAreaFrame, width=40, height=20)
-    plainTextArea.pack(side=tk.TOP, **STD_PACK)
-    fileButtons(textAreaFrame, file_commands["encrypt"]).pack(side=tk.TOP, **STD_PACK)
+    plainTextFrame = tk.Frame(row)
+    controlsFrame = tk.Frame(row)
+    cipherTextFrame = tk.Frame(row)
+    plainTextFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
+    controlsFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
+    cipherTextFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
 
-    buttonFrame = tk.Frame(row)
-    buttonFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
+    plainTextEndpoint = TextEndpoint(
+        plainTextFrame, "Plaintext", file_commands["encrypt"]
+    )
+
     dropDown = tk.OptionMenu(
-        buttonFrame,
+        controlsFrame,
         tk.StringVar(),
         *list(ENC_MODES.keys()),
     )
+    keyTextArea = tk.Text(controlsFrame, width=7, height=7)
+    encryptButton = tk.Button(controlsFrame, text="Encrypt", command=encrypt)
+    decryptButton = tk.Button(controlsFrame, text="Decrypt", command=decrypt)
+
     dropDown.pack(side=tk.TOP, **STD_PACK)
-    keyTextArea = tk.Text(buttonFrame, width=7, height=7)
     keyTextArea.pack(side=tk.TOP, **STD_PACK)
-    encryptButton = tk.Button(buttonFrame, text="Encrypt", command=encrypt)
     encryptButton.pack(side=tk.TOP, **STD_PACK)
-    decryptButton = tk.Button(buttonFrame, text="Decrypt", command=decrypt)
     decryptButton.pack(side=tk.TOP, **STD_PACK)
 
-    textAreaFrame = tk.Frame(row)
-    textAreaFrame.pack(side=tk.LEFT, fill=tk.X, **STD_PACK)
-    textAreaLabel = tk.Label(textAreaFrame, text="Cipher Text")
-    textAreaLabel.pack(side=tk.TOP, **STD_PACK)
-    cipherTextArea = tk.Text(textAreaFrame, width=40, height=20)
-    cipherTextArea.pack(side=tk.TOP, **STD_PACK)
-    fileButtons(textAreaFrame, file_commands["decrypt"]).pack(side=tk.TOP, **STD_PACK)
+    cipherTextEndpoint = TextEndpoint(
+        cipherTextFrame, "Ciphertext", file_commands["decrypt"]
+    )
 
     root.mainloop()

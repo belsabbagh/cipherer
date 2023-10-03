@@ -58,11 +58,13 @@ class Hill(EncMethod):
         return [[int(num) for num in row.split(",")] for row in csv.split("\n")]
 
     def encrypt(self, data: str) -> str:
+        data = data.upper()
         while len(data) % len(self.key) != 0:
             data += "X"
         return process_data(data, np.array(self.key))
 
     def decrypt(self, data: str) -> str:
+        data = data.upper()
         if len(data) % len(self.key) != 0:
             raise ValueError("Invalid cipher text.")
         try:
