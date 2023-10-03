@@ -37,4 +37,4 @@ To build this project run
    python -m PyInstaller --onefile --noconfirm --name=cipher  main.py 
 ```
 
-The `.exe` file can be found in `./dist`
+The `cipher.exe` file can be found in `./dist`
