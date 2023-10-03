@@ -106,7 +106,7 @@ if __name__ == "__main__":
     style = ttk.Style()
     style.theme_use("winnative")
     root.title("Cipherer")
-    root.geometry("840x600")
+    root.geometry("1200x600")
     root.minsize(840, 600)
     row = tk.Frame(root)
     row.pack(side=tk.TOP, fill=tk.BOTH, **STD_PACK)
@@ -121,23 +121,32 @@ if __name__ == "__main__":
     plainTextEndpoint = TextEndpoint(
         plainTextFrame, "Plaintext", file_commands["encrypt"]
     )
-
+    encMethodFrame = tk.Frame(controlsFrame)
     dropDown = tk.OptionMenu(
-        controlsFrame,
+        encMethodFrame,
         tk.StringVar(),
         *list(ENC_MODES.keys()),
         command=show_selected,
     )
+    encMethodLabel = tk.Label(encMethodFrame, text="Encryption Method")
+    encMethodLabel.pack(side=tk.LEFT, **STD_PACK)
+    dropDown.pack(side=tk.LEFT, **STD_PACK)
+
     keyTextArea = tk.Text(controlsFrame, width=7, height=7)
-    vignereMode = tk.OptionMenu(controlsFrame, tk.StringVar(), *["Auto", "Repeat"])
+    vigenereModeFrame = tk.Frame(controlsFrame)
     encryptButton = ttk.Button(controlsFrame, text="Encrypt", command=encrypt)
     decryptButton = ttk.Button(controlsFrame, text="Decrypt", command=decrypt)
 
-    dropDown.pack(side=tk.TOP, **STD_PACK)
+    encMethodFrame.pack(side=tk.TOP, **STD_PACK)
     keyTextArea.pack(side=tk.TOP, **STD_PACK)
-    vignereMode.pack(side=tk.TOP, **STD_PACK)
+    vigenereModeFrame.pack(side=tk.TOP, **STD_PACK)
     encryptButton.pack(side=tk.TOP, **STD_PACK)
     decryptButton.pack(side=tk.TOP, **STD_PACK)
+
+    vigenereModeLabel = tk.Label(vigenereModeFrame, text="Vigenere Mode")
+    vignereMode = tk.OptionMenu(vigenereModeFrame, tk.StringVar(), *["Auto", "Repeat"])
+    vigenereModeLabel.pack(side=tk.LEFT, **STD_PACK)
+    vignereMode.pack(side=tk.LEFT, **STD_PACK)
 
     cipherTextEndpoint = TextEndpoint(
         cipherTextFrame, "Ciphertext", file_commands["decrypt"]
