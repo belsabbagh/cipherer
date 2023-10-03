@@ -1,9 +1,13 @@
 from .__base import EncMethod
+from typing import Literal
 
 
 class Vigenere(EncMethod):
-    def __init__(self, key: str) -> None:
+    def __init__(self, key: str, mode: Literal["auto", "repeat"] = "repeat") -> None:
+        if mode not in ["auto", "repeat"]:
+            raise ValueError("Invalid mode. Mode must be 'auto' or 'repeat'.")
         self.key = key
+        self.mode = mode
         super().__init__()
 
     def __pad_key(self, data_len: int) -> str:
@@ -12,8 +16,11 @@ class Vigenere(EncMethod):
             key += key[i % len(key)]
         return "".join(key)
 
-    def __make_key(self, data_len: int) -> str:
+    def __make_key(self, data: str) -> str:
+        data_len = len(data)
         key = self.key
+        if self.mode == "auto":
+            return (self.key + data)[:data_len]
         if len(key) > data_len:
             return key[:data_len]
         if len(key) <= data_len:
