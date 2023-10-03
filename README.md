@@ -1,7 +1,7 @@
 
 # Cipherer
 
-Cipherer is a demo for classic cipher methods.
+Cipherer is a demo for classic cipher methods built in partial fulfillment of my network security course.
 
 ## Run Project
 
