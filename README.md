@@ -34,7 +34,7 @@ Start the server
 To build this project run
 
 ```bash
-   python -m PyInstaller --onefile --noconfirm main.py
+   python -m PyInstaller --onefile --noconfirm --name=cipher  main.py 
 ```
 
 The `.exe` file can be found in `./dist`
