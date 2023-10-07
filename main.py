@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere, Vernam
+from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere
 from src.gui.state import state
 import tkinter.filedialog as fd
 from src.gui import TextEndpoint
@@ -10,7 +10,6 @@ ENC_MODES = {
     "Playfair": Playfair,
     "Hill": Hill,
     "Vigenere": Vigenere,
-    "Vernam": Vernam,
 }
 
 STD_PACK = {"padx": 5, "pady": 5, "expand": True}
