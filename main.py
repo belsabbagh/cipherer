@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from src.methods import *
+from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere, Vernam
 from src.gui.state import state
 import tkinter.filedialog as fd
 from src.gui import TextEndpoint
