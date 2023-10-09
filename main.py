@@ -12,11 +12,18 @@ ENC_MODES = {
     "Vigenere": Vigenere,
 }
 
+hints = {
+    "Caesar": "Enter a value between 0 and 26 to encrypt/decrypt.",
+    "Playfair": "Enter a keyword to construct the playfair matrix.",
+    "Hill": "Enter an invertible square matrix (in CSV format) to construct the key.",
+    "Vigenere": "Enter a keyword to construct the key. Choose a mode (auto, repeat) to build the key.",
+}
+
 STD_PACK = {"padx": 5, "pady": 5, "expand": True}
 
 
 def clean_text(text):
-    return "".join([c for c in text if c.isalpha()]).upper()
+    return "".join(c for c in text if c.isalpha()).upper()
 
 
 def get_state():
@@ -33,8 +40,7 @@ def get_state():
 
 def show_selected(value):
     state["encMethod"] = value
-    if value == "Vigenere":
-        return
+    hint_text.set(hints.get(value, ""))
 
 
 def writeTextArea(textArea, text):
@@ -107,7 +113,13 @@ if __name__ == "__main__":
     root.title("Cipherer")
     root.geometry("1200x600")
     root.minsize(840, 600)
+
+    hint_text= tk.StringVar()
+    hint_text.set("")
+
     row = tk.Frame(root)
+    hint = tk.Label(root, textvariable=hint_text)
+    hint.pack(side=tk.TOP, fill=tk.BOTH, pady=4)
     row.pack(side=tk.TOP, fill=tk.BOTH, **STD_PACK)
 
     plainTextFrame = tk.Frame(row)
@@ -120,6 +132,8 @@ if __name__ == "__main__":
     plainTextEndpoint = TextEndpoint(
         plainTextFrame, "Plaintext", file_commands["encrypt"]
     )
+
+
     encMethodFrame = tk.Frame(controlsFrame)
     dropDown = tk.OptionMenu(
         encMethodFrame,
