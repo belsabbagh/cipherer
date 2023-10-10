@@ -114,7 +114,7 @@ if __name__ == "__main__":
     root.geometry("1200x600")
     root.minsize(840, 600)
 
-    hint_text= tk.StringVar()
+    hint_text = tk.StringVar()
     hint_text.set("")
 
     row = tk.Frame(root)
@@ -132,7 +132,6 @@ if __name__ == "__main__":
     plainTextEndpoint = TextEndpoint(
         plainTextFrame, "Plaintext", file_commands["encrypt"]
     )
-
 
     encMethodFrame = tk.Frame(controlsFrame)
     dropDown = tk.OptionMenu(
