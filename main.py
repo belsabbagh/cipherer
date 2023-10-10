@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere
 from src.gui.state import state
-import tkinter.filedialog as fd
-from src.gui import TextEndpoint
+from src import util
+from src.gui import TextEndpoint, STD_PACK, LabeledDropdown
+
 
 ENC_MODES = {
     "Caesar": Caesar,
@@ -19,22 +20,30 @@ hints = {
     "Vigenere": "Enter a keyword to construct the key. Choose a mode (auto, repeat) to build the key.",
 }
 
-STD_PACK = {"padx": 5, "pady": 5, "expand": True}
+
+file_commands = {
+    "encrypt": {
+        "open": lambda: util.openToText(plainTextEndpoint.textArea),
+        "save": lambda: util.saveFromText(plainTextEndpoint.textArea, "plaintext"),
+    },
+    "decrypt": {
+        "open": lambda: util.openToText(cipherTextEndpoint.textArea),
+        "save": lambda: util.saveFromText(cipherTextEndpoint.textArea, "ciphertext"),
+    },
+}
 
 
-def clean_text(text):
-    return "".join(c for c in text if c.isalpha()).upper()
-
-
-def get_state():
-    encMethod = dropDown.cget("text")
+def update_state():
+    encMethod = encMethodComponent.dropdown.cget("text")
     key = keyTextArea.get("1.0", tk.END).rsplit("\n", 1)[0]
     if encMethod != "Hill":
         key = key.replace("\n", "")
     state["key"] = key
-    state["plainText"] = clean_text(plainTextEndpoint.textArea.get("1.0", tk.END))
-    state["cipherText"] = clean_text(cipherTextEndpoint.textArea.get("1.0", tk.END))
-    state["vigenereMode"] = vignereMode.cget("text")
+    state["plainText"] = util.clean_text(plainTextEndpoint.textArea.get("1.0", tk.END))
+    state["cipherText"] = util.clean_text(
+        cipherTextEndpoint.textArea.get("1.0", tk.END)
+    )
+    state["vigenereMode"] = vigenereMode.dropdown.cget("text")
     return state
 
 
@@ -43,67 +52,29 @@ def show_selected(value):
     hint_text.set(hints.get(value, ""))
 
 
-def writeTextArea(textArea, text):
-    textArea.delete("1.0", tk.END)
-    textArea.insert("1.0", text)
-
-
 def encrypt():
-    state = get_state()
+    state = update_state()
     try:
         args = [state["key"]]
         if state["encMethod"] == "Vigenere":
             args.append(state["vigenereMode"].lower())
         encMethod = ENC_MODES[state["encMethod"]](*args)
         cipherText = encMethod.encrypt(state["plainText"])
-        writeTextArea(cipherTextEndpoint.textArea, cipherText)
+        util.writeTextArea(cipherTextEndpoint.textArea, cipherText)
         del encMethod
     except Exception as e:
         tk.messagebox.showerror("Error", e)
 
 
 def decrypt():
-    state = get_state()
+    state = update_state()
     try:
         encMethod = ENC_MODES[state["encMethod"]](state["key"])
         plainText = encMethod.decrypt(state["cipherText"])
-        writeTextArea(plainTextEndpoint.textArea, plainText)
+        util.writeTextArea(plainTextEndpoint.textArea, plainText)
         del encMethod
     except Exception as e:
         tk.messagebox.showerror("Error", e)
-
-
-def openToText(output):
-    filename = fd.askopenfilename()
-    with open(filename, "r") as file:
-        plainText = file.read()
-    writeTextArea(output, plainText)
-
-
-def saveFromText(textArea, name):
-    filename = fd.asksaveasfile(
-        initialfile=f"{name}.txt",
-        mode="w",
-        defaultextension=".txt",
-        filetypes=[("Text File", "*.txt")],
-    )
-    if filename is None:
-        return
-    text = textArea.get("1.0", tk.END)
-    filename.write(text)
-    filename.close()
-
-
-file_commands = {
-    "encrypt": {
-        "open": lambda: openToText(plainTextEndpoint.textArea),
-        "save": lambda: saveFromText(plainTextEndpoint.textArea, "plaintext"),
-    },
-    "decrypt": {
-        "open": lambda: openToText(cipherTextEndpoint.textArea),
-        "save": lambda: saveFromText(cipherTextEndpoint.textArea, "ciphertext"),
-    },
-}
 
 
 if __name__ == "__main__":
@@ -134,15 +105,9 @@ if __name__ == "__main__":
     )
 
     encMethodFrame = tk.Frame(controlsFrame)
-    dropDown = tk.OptionMenu(
-        encMethodFrame,
-        tk.StringVar(),
-        *list(ENC_MODES.keys()),
-        command=show_selected,
+    encMethodComponent = LabeledDropdown(
+        encMethodFrame, "Encryption Method", list(ENC_MODES.keys()), show_selected
     )
-    encMethodLabel = tk.Label(encMethodFrame, text="Encryption Method")
-    encMethodLabel.pack(side=tk.LEFT, **STD_PACK)
-    dropDown.pack(side=tk.LEFT, **STD_PACK)
 
     keyTextArea = tk.Text(controlsFrame, width=7, height=7)
     vigenereModeFrame = tk.Frame(controlsFrame)
@@ -155,11 +120,9 @@ if __name__ == "__main__":
     encryptButton.pack(side=tk.TOP, **STD_PACK)
     decryptButton.pack(side=tk.TOP, **STD_PACK)
 
-    vigenereModeLabel = tk.Label(vigenereModeFrame, text="Vigenere Mode")
-    vignereMode = tk.OptionMenu(vigenereModeFrame, tk.StringVar(), *["Auto", "Repeat"])
-    vigenereModeLabel.pack(side=tk.LEFT, **STD_PACK)
-    vignereMode.pack(side=tk.LEFT, **STD_PACK)
-
+    vigenereMode = LabeledDropdown(
+        vigenereModeFrame, "Vigenere Mode", ["Auto", "Repeat"]
+    )
     cipherTextEndpoint = TextEndpoint(
         cipherTextFrame, "Ciphertext", file_commands["decrypt"]
     )
