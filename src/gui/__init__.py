@@ -1,63 +1,93 @@
-import tkinter as tk
-from tkinter import ttk
-
-STD_PACK = {"padx": 5, "pady": 5, "expand": True}
+from PyQt6 import QtWidgets as QtW
+import PyQt6 as Qt
 
 
-class FileButtons(tk.Frame):
-    frame = None
-    openButton = None
-    saveButton = None
-
-    def __init__(self, master, commands) -> None:
-        self.openButton = ttk.Button(master, text="Open", command=commands["open"])
-        self.saveButton = ttk.Button(master, text="Save", command=commands["save"])
-        self.openButton.pack(side=tk.LEFT, padx=5, pady=5)
-        self.saveButton.pack(side=tk.LEFT, padx=5, pady=5)
+class App(QtW.QApplication):
+    def __init__(self):
+        super().__init__([])
+        self.window = MainWindow()
+        self.window.show()
 
 
-class TextEndpoint:
+class MainWindow(QtW.QMainWindow):
+    plainTextEndpoint = None
+    cipherTextEndpoint = None
+    controls = None
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("My App")
+        self.setMinimumSize(1000, 600)
+        mainWidget = QtW.QGroupBox()
+        mainLayout = QtW.QHBoxLayout()
+        self.plainTextEndpoint = TextEndpoint(
+            "Plain Text", {"open": lambda x: x, "save": lambda x: x}
+        )
+        self.cipherTextEndpoint = TextEndpoint(
+            "Cipher Text", {"open": lambda x: x, "save": lambda x: x}
+        )
+        self.controls = Controls()
+        mainLayout.addWidget(self.plainTextEndpoint)
+        mainLayout.addWidget(self.controls)
+        mainLayout.addWidget(self.cipherTextEndpoint)
+        mainWidget.setLayout(mainLayout)
+        self.setCentralWidget(mainWidget)
+
+
+class TextEndpoint(QtW.QWidget):
     textArea = None
-    fileButtons = None
     label = None
-    fileButtonsFrame = None
+    layout = None
+    fileButtons = None
 
-    def __init__(self, master, name, button_commands):
-        self.textArea = tk.Text(master, width=40, height=20)
-        self.label = ttk.Label(master, text=name)
-        self.fileButtonsFrame = tk.Frame(master)
-        self.fileButtons = FileButtons(self.fileButtonsFrame, button_commands)
-        self.label.pack(side=tk.TOP)
-        self.textArea.pack(side=tk.TOP)
-        self.fileButtonsFrame.pack(side=tk.TOP)
+    def __init__(self, name, button_commands):
+        super().__init__()
+        self.textArea = QtW.QTextEdit()
+        self.label = QtW.QLabel(name)
+        self.label.setAlignment(Qt.QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.layout = QtW.QVBoxLayout()
+        self.fileButtons = FileButtons(button_commands)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.textArea)
+        self.layout.addWidget(self.fileButtons)
+        self.setLayout(self.layout)
+
+    def write(self, text):
+        self.textArea.setText(text)
 
 
-class Controls:
+class FileButtons(QtW.QWidget):
+    def __init__(self, commands):
+        super().__init__()
+        self.openButton = Qt.QtWidgets.QPushButton("Open", clicked=commands["open"])
+        self.saveButton = Qt.QtWidgets.QPushButton("Save", clicked=commands["save"])
+        self.layout = QtW.QHBoxLayout()
+        self.layout.addWidget(self.openButton)
+        self.layout.addWidget(self.saveButton)
+        self.setLayout(self.layout)
+
+
+class Controls(QtW.QWidget):
     encMethod = None
     keyTextArea = None
     vigenereMode = None
     encryptButton = None
     decryptButton = None
 
-    def __init__(self, master, enc_cmd, dec_cmd) -> None:
-        self.encMethod = LabeledDropdown()
-        self.keyTextArea = tk.Text(master, width=7, height=7)
-        self.vigenereMode
-        encryptButton = ttk.Button(master, text="Encrypt", command=enc_cmd)
-        decryptButton = ttk.Button(master, text="Decrypt", command=dec_cmd)
-
-
-class LabeledDropdown:
-    label = None
-    dropdown = None
-
-    def __init__(self, master, label, options, callback=None) -> None:
-        self.label = tk.Label(master, text=label)
-        self.dropdown = tk.OptionMenu(
-            master,
-            tk.StringVar(),
-            *options,
-            command=callback,
-        )
-        self.label.pack(side=tk.LEFT, **STD_PACK)
-        self.dropdown.pack(side=tk.LEFT, **STD_PACK)
+    def __init__(self):
+        super().__init__()
+        self.layout = QtW.QVBoxLayout()
+        self.encMethod = QtW.QComboBox()
+        self.encMethod.addItems(["Caesar", "Vigenere", "Hill"])
+        self.keyTextArea = QtW.QTextEdit()
+        self.keyTextArea.resize(100, 100)
+        self.vigenereMode = QtW.QComboBox()
+        self.vigenereMode.addItems(["Auto", "Repeat"])
+        self.encryptButton = QtW.QPushButton("Encrypt")
+        self.decryptButton = QtW.QPushButton("Decrypt")
+        self.layout.addWidget(self.encMethod)
+        self.layout.addWidget(self.keyTextArea)
+        self.layout.addWidget(self.vigenereMode)
+        self.layout.addWidget(self.encryptButton)
+        self.layout.addWidget(self.decryptButton)
+        self.setLayout(self.layout)
