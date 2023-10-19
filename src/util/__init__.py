@@ -1,35 +1,35 @@
-
-import tkinter as tk
-import tkinter.filedialog as fd
-from src.gui.state import state
-
+from PyQt6 import QtWidgets as QtW
 
 def clean_text(text):
     return "".join(c for c in text if c.isalpha()).upper()
 
 
 
-def writeTextArea(textArea, text):
-    textArea.delete("1.0", tk.END)
-    textArea.insert("1.0", text)
+def writeTextArea(textArea: QtW.QTextEdit, text):
+    textArea.setText(text)
 
 
 def openToText(output):
-    filename = fd.askopenfilename()
-    with open(filename, "r") as file:
-        plainText = file.read()
+    filename, _ = QtW.QFileDialog.getOpenFileName(
+        None,
+        "Open File",
+        "",
+        "Text Files (*.txt);;All Files (*)",
+    )
+    if not filename:
+        return
+    with open(filename, "r") as f:
+        plainText = f.read()
     writeTextArea(output, plainText)
 
-
-def saveFromText(textArea, name):
-    filename = fd.asksaveasfile(
-        initialfile=f"{name}.txt",
-        mode="w",
-        defaultextension=".txt",
-        filetypes=[("Text File", "*.txt")],
+def saveFromText(textArea: QtW.QTextEdit, name):
+    filename, _ = QtW.QFileDialog.getSaveFileName(
+        None,
+        "Save File",
+        name,
+        "Text Files (*.txt);;All Files (*)",
     )
-    if filename is None:
+    if not filename:
         return
-    text = textArea.get("1.0", tk.END)
-    filename.write(text)
-    filename.close()
+    with open(filename, "w") as f:
+        f.write(textArea.toPlainText())
