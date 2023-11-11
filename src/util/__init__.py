@@ -1,8 +1,8 @@
 from PyQt6 import QtWidgets as QtW
 
+
 def clean_text(text):
     return "".join(c for c in text if c.isalpha()).upper()
-
 
 
 def writeTextArea(textArea: QtW.QTextEdit, text):
@@ -21,6 +21,7 @@ def openToText(output):
     with open(filename, "r") as f:
         plainText = f.read()
     writeTextArea(output, plainText)
+
 
 def saveFromText(textArea: QtW.QTextEdit, name):
     filename, _ = QtW.QFileDialog.getSaveFileName(

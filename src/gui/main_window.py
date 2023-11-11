@@ -69,7 +69,7 @@ class MainWindow(QtW.QMainWindow):
         run_fn = lambda cipher, text: cipher.decrypt(text)
         try:
             self.__process(
-                self.plainEndpoint.textArea, self.cipherEndpoint.textArea, run_fn
+                self.cipherEndpoint.textArea, self.plainEndpoint.textArea, run_fn
             )
         except Exception as e:
             QtW.QMessageBox.critical(self, "Error", str(e))
