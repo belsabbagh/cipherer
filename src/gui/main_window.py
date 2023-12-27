@@ -1,16 +1,8 @@
 from PyQt6 import QtWidgets as QtW
 from src.gui.endpoint import TextEndpoint
-from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere, Vernam
+from src.gui.controls import Controls
 from src.util import openToText, saveFromText
-
-
-ciphers = {
-    "Caesar": Caesar,
-    "Playfair": Playfair,
-    "Hill": Hill,
-    "Vigenere": Vigenere,
-    "Vernam": Vernam,
-}
+from src.config import CIPHERS
 
 file_cmds = {
     "plain": {
@@ -25,9 +17,10 @@ file_cmds = {
 
 
 class MainWindow(QtW.QMainWindow):
-    plainEndpoint = None
-    cipherEndpoint = None
-    controls = None
+    plainEndpoint: TextEndpoint
+    cipherEndpoint: TextEndpoint
+    controls: Controls
+    cipher: dict
 
     def __init__(self):
         super().__init__()
@@ -52,9 +45,13 @@ class MainWindow(QtW.QMainWindow):
         args = [key]
         if method == "Vigenere":
             args.append(self.controls.vigenereMode.currentText())
-        cipher = ciphers[method](*args)
+        cipher = CIPHERS[method]
+        c = cipher["class"](*args)
+        h = cipher["hint"]
+        self.controls.hint.setText(h)
+        print(h)
         text = inTextEdit.toPlainText().strip().upper().replace(" ", "")
-        outTextEdit.setText(run_fn(cipher, text))
+        outTextEdit.setText(run_fn(c, text))
 
     def on_encrypt(self):
         run_fn = lambda cipher, text: cipher.encrypt(text)
@@ -73,33 +70,3 @@ class MainWindow(QtW.QMainWindow):
             )
         except Exception as e:
             QtW.QMessageBox.critical(self, "Error", str(e))
-
-
-class Controls(QtW.QWidget):
-    encMethod = None
-    keyTextArea = None
-    vigenereMode = None
-    encryptButton = None
-    decryptButton = None
-
-    def __init__(self, button_commands):
-        super().__init__()
-        self.layout = QtW.QVBoxLayout()
-        self.encMethod = QtW.QComboBox()
-        self.encMethod.addItems(list(ciphers.keys()))
-        self.keyTextArea = QtW.QTextEdit()
-        self.keyTextArea.resize(100, 100)
-        self.vigenereMode = QtW.QComboBox()
-        self.vigenereMode.addItems(["Auto", "Repeat"])
-        self.encryptButton = QtW.QPushButton(
-            "Encrypt", clicked=button_commands["encrypt"]
-        )
-        self.decryptButton = QtW.QPushButton(
-            "Decrypt", clicked=button_commands["decrypt"]
-        )
-        self.layout.addWidget(self.encMethod)
-        self.layout.addWidget(self.keyTextArea)
-        self.layout.addWidget(self.vigenereMode)
-        self.layout.addWidget(self.encryptButton)
-        self.layout.addWidget(self.decryptButton)
-        self.setLayout(self.layout)
