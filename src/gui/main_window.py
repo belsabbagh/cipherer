@@ -44,12 +44,11 @@ class MainWindow(QtW.QMainWindow):
         method = self.controls.encMethod.currentText()
         args = [key]
         if method == "Vigenere":
-            args.append(self.controls.vigenereMode.currentText())
+            args.append(self.controls.vigenereMode.currentText().lower())
         cipher = CIPHERS[method]
         c = cipher["class"](*args)
         h = cipher["hint"]
         self.controls.hint.setText(h)
-        print(h)
         text = inTextEdit.toPlainText().strip().upper().replace(" ", "")
         outTextEdit.setText(run_fn(c, text))
 

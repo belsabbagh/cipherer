@@ -1,4 +1,4 @@
-from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere, Vernam
+from cryptexia.cryptexia.ciphers.classic import Caesar, Playfair, Hill, Vigenere, SimVernam
 
 
 CIPHERS = {
@@ -19,7 +19,7 @@ CIPHERS = {
         "hint": "Key is a string of letters.",
     },
     "Vernam": {
-        "class": Vernam,
+        "class": SimVernam,
         "hint": "Key is a string of letters.",
     },
 }
