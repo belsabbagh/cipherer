@@ -2,6 +2,7 @@
   import { writable } from "svelte/store";
   import CaesarKeyInput from "./lib/CaesarKeyInput.svelte";
   import PlayfairKeyInput from "./lib/PlayfairKeyInput.svelte";
+  import HillKeyInput from "./lib/HillKeyInput.svelte";
   import ciphers from "./core/ciphers.js";
 
   let plaintext = "";
@@ -22,13 +23,27 @@
         "Encrypts pairs of letters in the message using a 5x5 matrix.",
       component: PlayfairKeyInput,
     },
+    hill: {
+      name: "Hill",
+      description:
+        "Encrypts pairs of letters in the message using a 2x2 matrix.",
+      component: HillKeyInput,
+    },
   };
 
   const cipherComponent = writable(options[selectedCipher].component);
 
-  $: cipherComponent.set(options[selectedCipher].component);
+  $: {
+    if (selectedCipher === "hill") {
+      // @ts-ignore
+      key = [
+        [9, 4],
+        [5, 7],
+      ];
+    }
+    cipherComponent.set(options[selectedCipher].component);
+  }
   function encrypt() {
-    console.log(key);
     ciphertext = ciphers[selectedCipher].encrypt(plaintext, key);
   }
 
@@ -48,14 +63,15 @@
         <option value={cipher}>{options[cipher].name}</option>
       {/each}
     </select>
+    <div class="controls">
+      <svelte:component this={$cipherComponent} bind:key />
 
-    <svelte:component this={$cipherComponent} bind:key />
-
-    <button on:click={encrypt}>Encrypt</button>
-    <button on:click={decrypt}>Decrypt</button>
-    <div>
-      <p>Plaintext: {plaintext}</p>
-      <p>Ciphertext: {ciphertext}</p>
+      <button on:click={encrypt}>Encrypt</button>
+      <button on:click={decrypt}>Decrypt</button>
+      <div>
+        <p>Plaintext: {plaintext}</p>
+        <p>Ciphertext: {ciphertext}</p>
+      </div>
     </div>
   </div>
 </main>
@@ -73,16 +89,18 @@
     margin-bottom: 10px;
   }
 
-  input[type="number"],
-  input[type="text"] {
-    width: 80px;
-  }
-
   button {
     margin-top: 10px;
   }
 
   div {
     margin-top: 20px;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 </style>
